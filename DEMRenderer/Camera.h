@@ -5,26 +5,25 @@
 #include <glm.hpp>
 #include <gtx\transform.hpp>
 
-using namespace glm;
 using namespace std;
 
 class Camera
 {
 public:
-	explicit Camera(vec3& pos, float fov, float aspect, float zNear, float zFar);
+	explicit Camera(glm::vec3& pos, float fov, float aspect, float zNear, float zFar);
 	virtual ~Camera();
 
-	mat4 getViewProjection() const;
+    glm::mat4 GetViewProjection() const;
 
-	void moveRight(float x);
-	void moveUp(float y);
-	void moveForward(float z);
-	void zoomWith(float value);
+	void MoveRight(float x);
+	void MoveUp(float y);
+	void MoveForward(float z);
+	void ZoomWith(float value);
 
 private:
-	mat4 m_perspective;
-	vec3 m_position;
-	vec3 m_forward;
-	vec3 m_up;
+    glm::mat4 m_perspective;
+    glm::vec3 m_position;
+	glm::vec3 m_forward;
+	glm::vec3 m_up;
 };
 

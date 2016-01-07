@@ -2,7 +2,7 @@
 #include "Transform.h"
 
 
-Transform::Transform(const vec3& pos, const vec3& rot, const vec3& scale) :
+Transform::Transform(const glm::vec3& pos, const glm::vec3& rot, const glm::vec3& scale) :
 	m_pos(pos), m_rot(rot), m_scale(scale)
 {
 }
@@ -12,40 +12,40 @@ Transform::~Transform()
 {
 }
 
-const vec3& Transform::getPos() {
+const glm::vec3& Transform::GetPos() {
 	return m_pos;
 }
 
-const vec3& Transform::getRot() {
+const glm::vec3& Transform::GetRot() {
 	return m_rot;
 }
 
-const vec3& Transform::getScale() {
+const glm::vec3& Transform::GetScale() {
 	return m_scale;
 }
 
-void Transform::setPos(const vec3& pos) {
+void Transform::SetPos(const glm::vec3& pos) {
 	m_pos = pos;
 }
 
-void Transform::setRot(const vec3& rot) {
+void Transform::SetRot(const glm::vec3& rot) {
 	m_rot = rot;
 }
-void Transform::setScale(const vec3& scale) {
+void Transform::SetScale(const glm::vec3& scale) {
 	m_scale = scale;
 }
-void Transform::rotateWith(vec3& rot) {
+void Transform::RotateWith(glm::vec3& rot) {
 	m_rot += rot;
 }
 
-const mat4 Transform::getModel() const {
-	mat4 posMatrix = translate(m_pos);
-	mat4 rotXMatrix = rotate(m_rot.x, vec3(1, 0, 0));
-	mat4 rotYMatrix = rotate(m_rot.y, vec3(0, 1, 0));
-	mat4 rotZMatrix = rotate(m_rot.z, vec3(0, 0, 1));
-	mat4 scaleMatrix = scale(m_scale);
+const glm::mat4 Transform::GetModel() const {
+    glm::mat4 posMatrix = translate(m_pos);
+    glm::mat4 rotXMatrix = rotate(m_rot.x, glm::vec3(1, 0, 0));
+    glm::mat4 rotYMatrix = rotate(m_rot.y, glm::vec3(0, 1, 0));
+    glm::mat4 rotZMatrix = rotate(m_rot.z, glm::vec3(0, 0, 1));
+    glm::mat4 scaleMatrix = scale(m_scale);
 
-	mat4 rotMatrix = rotZMatrix * rotYMatrix * rotXMatrix;
+    glm::mat4 rotMatrix = rotZMatrix * rotYMatrix * rotXMatrix;
 
 	return posMatrix * rotMatrix * scaleMatrix;
 }

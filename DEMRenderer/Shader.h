@@ -9,8 +9,6 @@
 #include "Transform.h"
 #include "Camera.h"
 
-using namespace std;
-
 class Shader
 {
 public:
@@ -22,8 +20,8 @@ public:
 	
 	virtual ~Shader();
 
-	void bind();
-	void update(const Transform &transform, const Camera &camera);
+	void Bind();
+	void Update(const Transform &transform, const Camera &camera);
 
 private:
 
@@ -36,7 +34,7 @@ private:
 	GLuint m_uniforms[NUM_UNIFORMS];
 
 	string loadShader(const string& fileName);
-	void checkShaderError(GLuint shader, GLuint flag, bool isProgram, const string& errorMessage);
-	GLuint createShader(const string& text, unsigned int type);
+	void CheckShaderError(GLuint shader, GLuint flag, bool isProgram, const string& errorMessage);
+	GLuint CreateShader(const string& text, unsigned int type);
 };
 

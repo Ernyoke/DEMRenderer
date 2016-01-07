@@ -5,8 +5,8 @@
 Shader::Shader(const string& fileName) {
 	m_program = glCreateProgram();
 
-	m_shaders[0] = createShader(loadShader(fileName + ".vs"), GL_VERTEX_SHADER);
-	m_shaders[1] = createShader(loadShader(fileName + ".fs"), GL_FRAGMENT_SHADER);
+	m_shaders[0] = CreateShader(loadShader(fileName + ".vs"), GL_VERTEX_SHADER);
+	m_shaders[1] = CreateShader(loadShader(fileName + ".fs"), GL_FRAGMENT_SHADER);
 
 	for (unsigned int i = 0; i < NUM_SHADERS; ++i) {
 		glAttachShader(m_program, m_shaders[i]);
@@ -15,10 +15,10 @@ Shader::Shader(const string& fileName) {
 	glBindAttribLocation(m_program, 0, "position");
 
 	glLinkProgram(m_program);
-	checkShaderError(m_program, GL_LINK_STATUS, true, "Program linking failed!");
+	CheckShaderError(m_program, GL_LINK_STATUS, true, "Program linking failed!");
 
 	glValidateProgram(m_program);
-	checkShaderError(m_program, GL_VALIDATE_STATUS, true, "Program is invalid!");
+	CheckShaderError(m_program, GL_VALIDATE_STATUS, true, "Program is invalid!");
 
 	m_uniforms[TRAMSFORM_U] = glGetUniformLocation(m_program, "transform");
 }
@@ -32,12 +32,12 @@ Shader::~Shader() {
 	glDeleteProgram(m_program);
 }
 
-void Shader::bind() {
+void Shader::Bind() {
 	glUseProgram(m_program);
 }
 
-void Shader::update(const Transform &transform, const Camera &camera) {
-	mat4 model = camera.getViewProjection() * transform.getModel();
+void Shader::Update(const Transform &transform, const Camera &camera) {
+    glm::mat4 model = camera.GetViewProjection() * transform.GetModel();
 	glUniformMatrix4fv(m_uniforms[TRAMSFORM_U], 1, GL_FALSE, &model[0][0]);
 }
 
@@ -64,7 +64,7 @@ string Shader::loadShader(const std::string& fileName) {
 	return output;
 }
 
-void Shader::checkShaderError(GLuint shader, GLuint flag, bool isProgram, const std::string& errorMessage) {
+void Shader::CheckShaderError(GLuint shader, GLuint flag, bool isProgram, const std::string& errorMessage) {
 	GLint success = 1;
 	GLchar error[1024] = { 0 };
 
@@ -86,7 +86,7 @@ void Shader::checkShaderError(GLuint shader, GLuint flag, bool isProgram, const 
 	}
 }
 
-GLuint Shader::createShader(const string& text, unsigned int type) {
+GLuint Shader::CreateShader(const string& text, unsigned int type) {
 	GLuint shader = glCreateShader(type);
 	if (shader == 0) {
 		cerr << "Shader creation failed!" << endl;
@@ -101,7 +101,7 @@ GLuint Shader::createShader(const string& text, unsigned int type) {
 	glShaderSource(shader, 1, shaderString, shaderStringLength);
 	glCompileShader(shader);
 
-	checkShaderError(m_program, GL_COMPILE_STATUS, false, "Shader compilation failed!");
+	CheckShaderError(m_program, GL_COMPILE_STATUS, false, "Shader compilation failed!");
 
 	return shader;
 }

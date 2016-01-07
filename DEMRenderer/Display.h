@@ -7,7 +7,6 @@
 #include "Camera.h"
 #include "Transform.h"
 
-using namespace std;
 
 class Display
 {

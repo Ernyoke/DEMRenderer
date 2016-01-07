@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 	float counter = 0.0f;
 
 	Transform transform;
-	Camera camera(vec3(0, 0, -3), 70.0f, ASPECT_RATIO, 0.01f, 100.0f);
+	Camera camera(glm::vec3(0, 0, -3), 70.0f, ASPECT_RATIO, 0.01f, 100.0f);
 	display.setCamera(&camera);
 	display.setTransform(&transform);
 
@@ -64,8 +64,8 @@ int main(int argc, char** argv)
 		//transform.setScale(vec3(sinf(counter), 0, 0));
 		//transform.setRot(vec3(0, 0, counter));
 
-		shader.bind();
-		shader.update(transform, camera);
+		shader.Bind();
+		shader.Update(transform, camera);
 		mesh.draw();
 
 		display.Update();

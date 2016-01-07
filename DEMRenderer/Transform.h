@@ -3,29 +3,27 @@
 #include <glm.hpp>
 #include <gtx\transform.hpp>
 
-using namespace glm;
-
 class Transform
 {
 public:
-	explicit Transform(const vec3& pos = vec3(), const vec3& rot = vec3(), const vec3& scale = vec3(1, 1, 1));
+	explicit Transform(const glm::vec3& pos = glm::vec3(), const glm::vec3& rot = glm::vec3(), const glm::vec3& scale = glm::vec3(1, 1, 1));
 	virtual ~Transform();
 
-	void setPos(const vec3& pos);
-	void setRot(const vec3& rot);
-	void setScale(const vec3& scale);
+	void SetPos(const glm::vec3& pos);
+	void SetRot(const glm::vec3& rot);
+	void SetScale(const glm::vec3& scale);
 
-	void rotateWith(vec3 &rot);
+	void RotateWith(glm::vec3 &rot);
 
-	const vec3& getPos();
-	const vec3& getRot();
-	const vec3& getScale();
+	const glm::vec3& GetPos();
+	const glm::vec3& GetRot();
+	const glm::vec3& GetScale();
 
-	const mat4 getModel() const;
+	const glm::mat4 GetModel() const;
 
 private:
-	vec3 m_pos;
-	vec3 m_rot;
-	vec3 m_scale;
+	glm::vec3 m_pos;
+	glm::vec3 m_rot;
+	glm::vec3 m_scale;
 };
 

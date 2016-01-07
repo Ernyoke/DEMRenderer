@@ -69,14 +69,14 @@ void Display::Update() {
 				m_curMouseXCoord = event.motion.x;
 				m_curMouseYCoord = event.motion.y;
 				if (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-					m_camera->moveRight((float)(m_curMouseXCoord - m_prevMouseXCoord) / (m_width));
-					m_camera->moveUp((float)(m_curMouseYCoord - m_prevMouseYCoord) / (m_height));
+					m_camera->MoveRight((float)(m_curMouseXCoord - m_prevMouseXCoord) / (m_width));
+					m_camera->MoveUp((float)(m_curMouseYCoord - m_prevMouseYCoord) / (m_height));
 				}
 				else
 				{
 					if (m_transform != nullptr) {
 						if (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
-							m_transform->rotateWith(vec3((float)(m_curMouseYCoord - m_prevMouseYCoord) / (m_height), 
+							m_transform->RotateWith(glm::vec3((float)(m_curMouseYCoord - m_prevMouseYCoord) / (m_height),
 								(float)(m_curMouseXCoord - m_prevMouseXCoord) / (m_width), 0));
 						}
 					}
@@ -84,10 +84,10 @@ void Display::Update() {
 			}
 			if (event.type == SDL_MOUSEWHEEL) {
 				if (event.wheel.y > 0) {
-					m_camera->zoomWith(0.05f);
+					m_camera->ZoomWith(0.05f);
 				}
 				else {
-					m_camera->zoomWith(-0.05f);
+					m_camera->ZoomWith(-0.05f);
 				}
 			}
 		}

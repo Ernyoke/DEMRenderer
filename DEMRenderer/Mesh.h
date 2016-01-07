@@ -5,8 +5,6 @@
 #include <GL\glew.h>
 #include <glm.hpp>
 
-#include "Vertex.h"
-
 class Mesh
 {
 public:
