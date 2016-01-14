@@ -27,7 +27,8 @@ private:
 
 	static const unsigned int NUM_SHADERS = 2;
 	static const unsigned int NUM_UNIFORMS = 2;
-	static const unsigned int TRAMSFORM_U = 1;
+
+	static const unsigned int TRAMSFORM_U = 0;
 
 	GLuint m_program;
 	GLuint m_shaders[NUM_SHADERS];

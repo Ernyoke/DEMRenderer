@@ -66,16 +66,15 @@ public:
     long GetElevationMapSize();
     long GetSurfaceMapSize();
 
-    glm::vec3* GetElevationMap() const;
-    glm::vec3* GetSurfaceMap() const;
+    glm::vec3* GetElevationMap();
+    glm::vec3* GetSurfaceMap();
 
 private:
 	std::ifstream m_file;
     DemHeader m_header;
     std::vector<DemElevationVector> m_elevations;
-    glm::vec3 *m_vertices;
-    glm::vec3* m_surface;
-    std::vector<glm::vec3> m_vecSurface;
+    std::vector<glm::vec3> m_surfacePoints;
+    std::vector<glm::vec3> m_surfaceTriangles;
 
     //helper methods
     void LogHeader();

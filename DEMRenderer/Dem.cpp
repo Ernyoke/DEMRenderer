@@ -2,7 +2,7 @@
 #include "Dem.h"
 
 
-Dem::Dem() : m_vertices { nullptr }
+Dem::Dem()
 {
 }
 
@@ -137,15 +137,13 @@ void Dem::CreateNormalizedVector() {
     std::function<float(float, float, float)> normalize = [&](float val, float min, float max) {
         return (val - min) / (max - min);
     };
-    long size = GetElevationMapSize();
-    long counter = 0;
-    m_vertices = new glm::vec3[size];
+    size_t counter = 0;
     for (int i = 0; i < m_header.columns; ++i) {
         for (int j = 0; j < m_elevations.at(i).rows; ++j) {
-            m_vertices[counter++] = glm::vec3(
-                normalize(i, 0.0f, m_header.columns), 
+            m_surfacePoints.push_back(std::move(glm::vec3(
+                normalize(i, 0.0f, m_header.columns),
                 normalize(m_elevations.at(i).elevations.at(j), m_header.minElevation, m_header.maxElevation),
-                normalize(j, 0.0f, m_elevations.at(i).rows));
+                normalize(j, 0.0f, m_elevations.at(i).rows))));
         }
     }
 }
@@ -174,16 +172,15 @@ void Dem::CreateNormalizedMap() {
                 normalize(m_elevations.at(i + 1).elevations.at(j + 1), m_header.minElevation, m_header.maxElevation),
                 normalize(j + 1, 0.0f, m_elevations.at(i + 1).rows));
 
-            m_vecSurface.push_back(point1);
-            m_vecSurface.push_back(point2);
-            m_vecSurface.push_back(point3);
+            m_surfaceTriangles.push_back(std::move(point1));
+            m_surfaceTriangles.push_back(std::move(point2));
+            m_surfaceTriangles.push_back(std::move(point3));
 
-            m_vecSurface.push_back(point3);
-            m_vecSurface.push_back(point4);
-            m_vecSurface.push_back(point2);
+            m_surfaceTriangles.push_back(std::move(point3));
+            m_surfaceTriangles.push_back(std::move(point4));
+            m_surfaceTriangles.push_back(std::move(point2));
         }
     }
-    m_surface = m_vecSurface.data();
 }
 
 void Dem::LogHeader() {
@@ -213,41 +210,30 @@ void Dem::LogHeader() {
 void Dem::LogMap() {
     int size = GetElevationMapSize();
     std::cout << "Vertex vector size:" << size << std::endl;
-    /*
     for (int i = 0; i < m_header.columns; ++i) {
         for (int j = 0; j < m_elevations.at(i).rows; ++j) {
             std::cout << m_elevations.at(i).elevations.at(j) << " ";
         }
         std::cout << std::endl;
     }
-    */
-    for (int i = 0; i < size; ++i) {
-        std::cout << m_vertices[i].x << " " << m_vertices[i].y << " " << m_vertices[i].z << std::endl;
-    }
 }
 
 long Dem::GetElevationMapSize() {
-    long size = 0;
-    for (auto it : m_elevations) {
-        size += it.rows;
-    }
-    return size;
+    return m_surfacePoints.size();
 }
 
 long Dem::GetSurfaceMapSize() {
-    return m_vecSurface.size();
+    return m_surfaceTriangles.size();
 }
 
-glm::vec3* Dem::GetElevationMap() const {
-    return this->m_vertices;
+glm::vec3* Dem::GetElevationMap() {
+    return m_surfacePoints.data();
 }
 
-glm::vec3* Dem::GetSurfaceMap() const {
-    return this->m_surface;
+glm::vec3* Dem::GetSurfaceMap() {
+    return m_surfaceTriangles.data();
 }
 
 void Dem::Close() {
     m_file.close();
-    long size = GetElevationMapSize();
-    delete m_vertices;
 }
