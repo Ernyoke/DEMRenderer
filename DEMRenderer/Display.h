@@ -17,11 +17,11 @@ public:
 	Display(const Display&) = delete;
 	Display operator=(const Display&) = delete;
 
-	void setCamera(Camera *camera);
-	void setTransform(Transform *transform);
+	void SetCamera(Camera *camera);
+	void SetTransform(Transform *transform);
 
 	void Update();
-	inline const bool isWindowClosed() { return m_isClosed; }
+	inline const bool IsWindowClosed() { return m_isClosed; }
 	
 	virtual ~Display();
 

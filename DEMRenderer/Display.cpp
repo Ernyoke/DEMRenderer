@@ -4,7 +4,8 @@
 #define ONE_SECOND_MS 1000
 
 Display::Display(const unsigned int width, const unsigned int height, const unsigned int fps, const string& title) :
-	m_width(width), m_height(height), m_fps(fps), m_title(title), m_isClosed(true), m_camera(nullptr), m_transform(nullptr)
+    m_width{ width }, m_height{ height }, m_fps{ fps }, m_title{ title }, 
+    m_isClosed{ true }, m_camera{ nullptr }, m_transform{ nullptr }
 {
 	SDL_Init(SDL_INIT_EVERYTHING);
 
@@ -43,11 +44,11 @@ Display::~Display()
 	SDL_Quit();
 }
 
-void Display::setCamera(Camera *camera) {
+void Display::SetCamera(Camera *camera) {
 	this->m_camera = camera;
 }
 
-void Display::setTransform(Transform *transform) {
+void Display::SetTransform(Transform *transform) {
 	this->m_transform = transform;
 }
 

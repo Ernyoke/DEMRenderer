@@ -3,7 +3,7 @@
 
 
 Mesh::Mesh(glm::vec3 *vertices, size_t size) :
-	m_size(size)
+    m_size{ size }
 {
 
 	glGenVertexArrays(1, &m_vertexArrayObject);
@@ -20,14 +20,16 @@ Mesh::Mesh(glm::vec3 *vertices, size_t size) :
 
 }
 
-
 Mesh::~Mesh()
 {
 	glDeleteVertexArrays(1, &m_vertexArrayObject);
 }
 
-void Mesh::draw() {
+void Mesh::DrawElevations() {
 	glBindVertexArray(m_vertexArrayObject);
-	glDrawArrays(GL_POINTS, 0, m_size);
+	glDrawArrays(GL_TRIANGLES, 0, m_size);
 	glBindVertexArray(0);
+}
+
+void Mesh::DrawSurface() {
 }

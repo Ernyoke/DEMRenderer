@@ -2,7 +2,7 @@
 #include "Dem.h"
 
 
-Dem::Dem()
+Dem::Dem() : m_vertices { nullptr }
 {
 }
 
@@ -31,9 +31,9 @@ void Dem::Open(const std::string& path) {
 	}
 }
 
-double Dem::ToDouble(std::string& value) {
+float Dem::ToFloat(std::string& value) {
     std::replace(value.begin(), value.end(), 'D', 'E');
-    return std::stod(value);
+    return std::stof(value);
 }
 
 void Dem::ParseHeader() {
@@ -58,7 +58,7 @@ void Dem::ParseHeader() {
     for (int i = 0; i < m_header.sides; ++i) {
         m_file >> coord1;
         m_file >> coord2;
-        m_header.corners.push_back(std::make_pair<double, double>(ToDouble(coord1), ToDouble(coord2)));
+        m_header.corners.push_back(std::make_pair<float, float>(ToFloat(coord1), ToFloat(coord2)));
     }
 
     std::string strMaxElevation;
@@ -67,21 +67,21 @@ void Dem::ParseHeader() {
     m_file >> strMinElevation;
     m_file >> strMaxElevation;
 
-    m_header.minElevation = ToDouble(strMinElevation);
-    m_header.maxElevation = ToDouble(strMaxElevation);
+    m_header.minElevation = ToFloat(strMinElevation);
+    m_header.maxElevation = ToFloat(strMaxElevation);
 
     std::string value;
 
     m_file >> value;
-    m_header.primaryAngle = ToDouble(value);
+    m_header.primaryAngle = ToFloat(value);
 
     std::string value2;
     //m_file >> m_header.accuracyCode;
 
     m_file >> value2;
-    m_header.spatialResolution[0] = ToDouble(value);
-    m_header.spatialResolution[1] = ToDouble(value);
-    m_header.spatialResolution[2] = ToDouble(value);
+    m_header.spatialResolution[0] = ToFloat(value);
+    m_header.spatialResolution[1] = ToFloat(value);
+    m_header.spatialResolution[2] = ToFloat(value);
 
     m_file >> m_header.rows;
     m_file >> m_header.columns;
@@ -101,15 +101,15 @@ void Dem::ParseMap() {
         m_file >> elevationVector.columns;
         std::string value;
         m_file >> value;
-        elevationVector.groundPlanCoordX = ToDouble(value);
+        elevationVector.groundPlanCoordX = ToFloat(value);
         m_file >> value;
-        elevationVector.groundPlanCoordY = ToDouble(value);
+        elevationVector.groundPlanCoordY = ToFloat(value);
         m_file >> value;
-        elevationVector.localDatum = ToDouble(value);
+        elevationVector.localDatum = ToFloat(value);
         m_file >> value;
-        elevationVector.minElevation = ToDouble(value);
+        elevationVector.minElevation = ToFloat(value);
         m_file >> value;
-        elevationVector.maxElevation = ToDouble(value);
+        elevationVector.maxElevation = ToFloat(value);
 
         int aux;
         for (int j = 0; j < elevationVector.rows; ++j) {
@@ -120,7 +120,7 @@ void Dem::ParseMap() {
         m_elevations.push_back(std::move(elevationVector));
     }
 
-    CreateVerticeVector();
+    CreateNormalizedMap();
 
     //LogMap();
 }
@@ -133,25 +133,57 @@ void Dem::Parse() {
     ParseMap();
 }
 
-void Dem::CreateVerticeVector() {
-    std::function<float(double, double, double)> normalize = [&](double val, double min, double max) {
-        //return (val - min) / (max - min);
-        float a = val - min;
-        float b = max - min;
-        float c = a / b;
-        return c;
+void Dem::CreateNormalizedVector() {
+    std::function<float(float, float, float)> normalize = [&](float val, float min, float max) {
+        return (val - min) / (max - min);
     };
-    long size = GetVertexMapSize();
+    long size = GetElevationMapSize();
     long counter = 0;
     m_vertices = new glm::vec3[size];
     for (int i = 0; i < m_header.columns; ++i) {
         for (int j = 0; j < m_elevations.at(i).rows; ++j) {
             m_vertices[counter++] = glm::vec3(
-                normalize(i, 0.0, m_header.columns), 
+                normalize(i, 0.0f, m_header.columns), 
                 normalize(m_elevations.at(i).elevations.at(j), m_header.minElevation, m_header.maxElevation),
-                normalize(j, 0.0, m_elevations.at(i).rows));
+                normalize(j, 0.0f, m_elevations.at(i).rows));
         }
     }
+}
+
+void Dem::CreateNormalizedMap() {
+    std::function<float(float, float, float)> normalize = [&](float val, float min, float max) {
+        return (val - min) / (max - min);
+    };
+    long counter = 0;
+    for (int i = 0; i < m_header.columns - 1; ++i) {
+        for (int j = 0; j < m_elevations.at(i).rows - 1 && j < m_elevations.at(i + 1) .rows- 1; ++j) {
+            glm::vec3 point1 = glm::vec3(
+                normalize(i, 0.0f, m_header.columns),
+                normalize(m_elevations.at(i).elevations.at(j), m_header.minElevation, m_header.maxElevation),
+                normalize(j, 0.0f, m_elevations.at(i).rows));
+            glm::vec3 point2 = glm::vec3(
+                normalize(i, 0.0f, m_header.columns),
+                normalize(m_elevations.at(i).elevations.at(j + 1), m_header.minElevation, m_header.maxElevation),
+                normalize(j + 1, 0.0f, m_elevations.at(i).rows));
+            glm::vec3 point3 = glm::vec3(
+                normalize(i + 1, 0.0f, m_header.columns),
+                normalize(m_elevations.at(i + 1).elevations.at(j), m_header.minElevation, m_header.maxElevation),
+                normalize(j, 0.0f, m_elevations.at(i + 1).rows));
+            glm::vec3 point4 = glm::vec3(
+                normalize(i + 1, 0.0f, m_header.columns),
+                normalize(m_elevations.at(i + 1).elevations.at(j + 1), m_header.minElevation, m_header.maxElevation),
+                normalize(j + 1, 0.0f, m_elevations.at(i + 1).rows));
+
+            m_vecSurface.push_back(point1);
+            m_vecSurface.push_back(point2);
+            m_vecSurface.push_back(point3);
+
+            m_vecSurface.push_back(point3);
+            m_vecSurface.push_back(point4);
+            m_vecSurface.push_back(point2);
+        }
+    }
+    m_surface = m_vecSurface.data();
 }
 
 void Dem::LogHeader() {
@@ -179,7 +211,8 @@ void Dem::LogHeader() {
 }
 
 void Dem::LogMap() {
-    std::cout << "Vertex vector size:" << GetVertexMapSize() << std::endl;
+    int size = GetElevationMapSize();
+    std::cout << "Vertex vector size:" << size << std::endl;
     /*
     for (int i = 0; i < m_header.columns; ++i) {
         for (int j = 0; j < m_elevations.at(i).rows; ++j) {
@@ -188,13 +221,12 @@ void Dem::LogMap() {
         std::cout << std::endl;
     }
     */
-    int size = GetVertexMapSize();
     for (int i = 0; i < size; ++i) {
         std::cout << m_vertices[i].x << " " << m_vertices[i].y << " " << m_vertices[i].z << std::endl;
     }
 }
 
-long Dem::GetVertexMapSize() {
+long Dem::GetElevationMapSize() {
     long size = 0;
     for (auto it : m_elevations) {
         size += it.rows;
@@ -202,12 +234,20 @@ long Dem::GetVertexMapSize() {
     return size;
 }
 
-glm::vec3* Dem::GetVertexMap() const {
+long Dem::GetSurfaceMapSize() {
+    return m_vecSurface.size();
+}
+
+glm::vec3* Dem::GetElevationMap() const {
     return this->m_vertices;
+}
+
+glm::vec3* Dem::GetSurfaceMap() const {
+    return this->m_surface;
 }
 
 void Dem::Close() {
     m_file.close();
-    long size = GetVertexMapSize();
+    long size = GetElevationMapSize();
     delete m_vertices;
 }

@@ -3,7 +3,7 @@
 
 
 Camera::Camera(glm::vec3& pos, float fov, float aspect, float zNear, float zFar) :
-	m_position(pos)
+	m_position{ pos }
 {
 	m_perspective = glm::perspective(fov, aspect, zNear, zFar);
 	m_forward = glm::vec3(0, 0, 1);
@@ -21,17 +21,14 @@ glm::mat4 Camera::GetViewProjection() const {
 
 void Camera::MoveRight(float x) {
 	m_position.x += x;
-	cout << x << " " << m_position.x << endl;
 }
 
 void Camera::MoveUp(float y) {
 	m_position.y += y;
-	cout << y << " " << m_position.x << endl;
 }
 
 void Camera::MoveForward(float z) {
 	m_position.z += z;
-	cout << z << " " << m_position.z << endl;
 }
 
 void Camera::ZoomWith(float value) {

@@ -8,14 +8,15 @@
 class Mesh
 {
 public:
-	explicit Mesh(glm::vec3* vertices, size_t size);
+	Mesh(glm::vec3* vertices, size_t size);
 	virtual ~Mesh();
 
 	//make this class noncopyable
 	Mesh(const Mesh&) = delete;
 	Mesh operator=(const Mesh&) = delete;
 
-	void draw();
+	void DrawElevations();
+    void DrawSurface();
 
 private:
 	enum {
@@ -27,6 +28,8 @@ private:
 
 	GLuint m_vertexArrayObject;
 	GLuint m_vertexArrayBuffers[NUMBUFFERS];
+
+    std::vector < std::vector<glm::vec3> > *m_vertexMap;
 	
 };
 

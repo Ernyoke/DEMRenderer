@@ -32,12 +32,12 @@ struct DemHeader {
     int unitCodePlanimCoord;
     int unitCodeElevation;
     int sides;
-    std::vector< std::pair<double, double> > corners;
-    double minElevation;
-    double maxElevation;
-    double primaryAngle;
+    std::vector< std::pair<float, float> > corners;
+    float minElevation;
+    float maxElevation;
+    float primaryAngle;
     int accuracyCode;
-    double spatialResolution[3];
+    float spatialResolution[3];
     int rows;
     int columns;
 };
@@ -45,10 +45,10 @@ struct DemHeader {
 struct DemElevationVector {
     int x, y;
     int rows, columns;
-    double groundPlanCoordX, groundPlanCoordY;
-    double localDatum;
-    double minElevation;
-    double maxElevation;
+    float groundPlanCoordX, groundPlanCoordY;
+    float localDatum;
+    float minElevation;
+    float maxElevation;
     std::vector<int>elevations;
 };
 
@@ -61,16 +61,21 @@ public:
 	void Open(const std::string& path);
 	void Parse();
     void Close();
-    void CreateVerticeVector();
-    long GetVertexMapSize();
+    void CreateNormalizedVector();
+    void CreateNormalizedMap();
+    long GetElevationMapSize();
+    long GetSurfaceMapSize();
 
-    glm::vec3* GetVertexMap() const;
+    glm::vec3* GetElevationMap() const;
+    glm::vec3* GetSurfaceMap() const;
 
 private:
 	std::ifstream m_file;
     DemHeader m_header;
     std::vector<DemElevationVector> m_elevations;
     glm::vec3 *m_vertices;
+    glm::vec3* m_surface;
+    std::vector<glm::vec3> m_vecSurface;
 
     //helper methods
     void LogHeader();
@@ -78,6 +83,6 @@ private:
     void LogMap();
     void ParseMap();
 
-    double ToDouble(std::string &value);
+    float ToFloat(std::string &value);
 };
 

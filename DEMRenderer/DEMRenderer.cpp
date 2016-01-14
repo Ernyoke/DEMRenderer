@@ -14,34 +14,28 @@
 #include "Camera.h"
 #include "Dem.h"
 
-#define WIDTH 800
-#define HEGHT 600
-#define FPS 60
-#define ASPECT_RATIO (float)(WIDTH) / (float)(HEGHT)
-#define TITLE "DEMRenderer"
-
-using namespace std;
+constexpr int WIDTH = 800;
+constexpr int HEGHT = 600;
+constexpr int FPS = 60;
+constexpr float ASPECT_RATIO = (float)(WIDTH) / (float)(HEGHT);
+constexpr char* TITLE = "DEMRenderer";
 
 int main(int argc, char** argv)
 {
-	Display display(WIDTH, HEGHT, FPS, TITLE);
+    bool result{ false };
 
-	glm::vec3 vertices[] = { glm::vec3(-0.5f,  -0.5f, 0.0f), glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(0.5f, -0.5f, 0.0f) };
+	//glm::vec3 vertices[] = { glm::vec3(-0.5f,  -0.5f, 0.0f), glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(0.5f, -0.5f, 0.0f),
+    //    glm::vec3(0.5f,  -0.5f, 0.0f), glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(0.0f, 0.5f, 0.0f) };
 
-	Shader shader("./Shaders/basicshader");
 	//Mesh mesh(vertices, extent< decltype(vertices) >::value);
 
-	float counter = 0.0f;
-
-	Transform transform;
-	Camera camera(glm::vec3(0, 0, -3), 70.0f, ASPECT_RATIO, 0.01f, 100.0f);
-	display.setCamera(&camera);
-	display.setTransform(&transform);
+    float counter{ 0.0f };
 
     Dem dem;
     try {
         dem.Open("Dems/DEM_30m/bushkill_pa.dem");
         dem.Parse();
+        result = true;
     }
     catch (FileTypeException &ex) {
         std::cout << ex.what() << std::endl;
@@ -53,24 +47,37 @@ int main(int argc, char** argv)
         std::cout << "Unknown exception!" << endl;
     }
 
-    Mesh mesh(dem.GetVertexMap(), dem.GetVertexMapSize());
+    if (result) {
+        //set up the display frame
+        Display display(WIDTH, HEGHT, FPS, TITLE);
+        Shader shader("./Shaders/basicshader");
 
-	while (!display.isWindowClosed())
-	{
-		glClearColor(0.0f, 0.15f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+        //set up the camera
+        Camera camera(glm::vec3(0, 0, -3), 70.0f, ASPECT_RATIO, 0.01f, 100.0f);
+        display.SetCamera(&camera);
 
-		//transform.setPos(vec3(sinf(counter), 0, 0));
-		//transform.setScale(vec3(sinf(counter), 0, 0));
-		//transform.setRot(vec3(0, 0, counter));
+        //set up the transformation vector
+        Transform transform;
+        display.SetTransform(&transform);
 
-		shader.Bind();
-		shader.Update(transform, camera);
-		mesh.draw();
+        //get the surface from the DEM file
+        Mesh mesh(dem.GetSurfaceMap(), dem.GetSurfaceMapSize());
 
-		display.Update();
-		counter += 0.01f;
-	}
+        //Mesh mesh(vertices, extent< decltype(vertices) >::value);
+
+        while (!display.IsWindowClosed())
+        {
+            glClearColor(0.0f, 0.15f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            shader.Bind();
+            shader.Update(transform, camera);
+            mesh.DrawElevations();
+
+            display.Update();
+            counter += 0.01f;
+        }
+    }
 
     return EXIT_SUCCESS;
 }
