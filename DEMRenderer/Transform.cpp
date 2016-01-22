@@ -13,29 +13,29 @@ Transform::~Transform()
 }
 
 const glm::vec3& Transform::GetPos() {
-	return m_pos;
+    return m_pos;
 }
 
 const glm::vec3& Transform::GetRot() {
-	return m_rot;
+    return m_rot;
 }
 
 const glm::vec3& Transform::GetScale() {
-	return m_scale;
+    return m_scale;
 }
 
 void Transform::SetPos(const glm::vec3& pos) {
-	m_pos = pos;
+    m_pos = pos;
 }
 
 void Transform::SetRot(const glm::vec3& rot) {
-	m_rot = rot;
+    m_rot = rot;
 }
 void Transform::SetScale(const glm::vec3& scale) {
-	m_scale = scale;
+    m_scale = scale;
 }
 void Transform::RotateWith(glm::vec3& rot) {
-	m_rot += rot;
+    m_rot += rot;
 }
 
 const glm::mat4 Transform::GetModel() const {
@@ -47,5 +47,5 @@ const glm::mat4 Transform::GetModel() const {
 
     glm::mat4 rotMatrix = rotZMatrix * rotYMatrix * rotXMatrix;
 
-	return posMatrix * rotMatrix * scaleMatrix;
+    return posMatrix * rotMatrix * scaleMatrix;
 }

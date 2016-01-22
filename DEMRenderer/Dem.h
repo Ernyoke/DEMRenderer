@@ -11,16 +11,16 @@
 
 class FileTypeException : std::exception {
 public:
-	virtual char *what() {
-		return "Invalid file extension!";
-	}
+    virtual char *what() {
+        return "Invalid file extension!";
+    }
 };
 
 class FileOpenException : std::exception {
 public:
-	virtual char *what() {
-		return ".dem file could not be opened!";
-	}
+    virtual char *what() {
+        return ".dem file could not be opened!";
+    }
 };
 
 struct DemHeader {
@@ -55,11 +55,11 @@ struct DemElevationVector {
 class Dem
 {
 public:
-	Dem();
-	virtual ~Dem();
+    Dem();
+    virtual ~Dem();
 
-	void Open(const std::string& path);
-	void Parse();
+    void Open(const std::string& path);
+    void Parse();
     void Close();
     void CreateNormalizedVector();
     void CreateNormalizedMap();
@@ -68,19 +68,22 @@ public:
 
     glm::vec3* GetElevationMap();
     glm::vec3* GetSurfaceMap();
+    glm::vec3* GetNormals();
 
 private:
-	std::ifstream m_file;
+    std::ifstream m_file;
     DemHeader m_header;
     std::vector<DemElevationVector> m_elevations;
     std::vector<glm::vec3> m_surfacePoints;
     std::vector<glm::vec3> m_surfaceTriangles;
+    std::vector<glm::vec3> m_normals;
 
     //helper methods
     void LogHeader();
     void ParseHeader();
     void LogMap();
     void ParseMap();
+    void CalcNormals();
 
     float ToFloat(std::string &value);
 };

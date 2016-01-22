@@ -14,21 +14,21 @@ Dem::~Dem()
 
 void Dem::Open(const std::string& path) {
 
-	std::function<bool(const std::string&)> isDemFile =
-		[&](const std::string& path) -> bool {
-		std::string extension = path.substr(path.find_last_of("."));
-        std::transform(extension.begin(), extension.end(), extension.begin(),  ::tolower);
-		return extension == ".dem";
-	};
+    std::function<bool(const std::string&)> isDemFile =
+        [&](const std::string& path) -> bool {
+        std::string extension = path.substr(path.find_last_of("."));
+        std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+        return extension == ".dem";
+    };
 
-	if (!isDemFile(path)) {
-		throw FileTypeException();
-	}
+    if (!isDemFile(path)) {
+        throw FileTypeException();
+    }
 
-	m_file.open(path);
-	if (!m_file.is_open()) {
-		throw FileOpenException();
-	}
+    m_file.open(path);
+    if (!m_file.is_open()) {
+        throw FileOpenException();
+    }
 }
 
 float Dem::ToFloat(std::string& value) {
@@ -121,6 +121,7 @@ void Dem::ParseMap() {
     }
 
     CreateNormalizedMap();
+    CalcNormals();
 
     //LogMap();
 }
@@ -154,7 +155,7 @@ void Dem::CreateNormalizedMap() {
     };
     long counter = 0;
     for (int i = 0; i < m_header.columns - 1; ++i) {
-        for (int j = 0; j < m_elevations.at(i).rows - 1 && j < m_elevations.at(i + 1) .rows- 1; ++j) {
+        for (int j = 0; j < m_elevations.at(i).rows - 1 && j < m_elevations.at(i + 1).rows - 1; ++j) {
             glm::vec3 point1 = glm::vec3(
                 normalize(i, 0.0f, m_header.columns),
                 normalize(m_elevations.at(i).elevations.at(j), m_header.minElevation, m_header.maxElevation),
@@ -176,10 +177,43 @@ void Dem::CreateNormalizedMap() {
             m_surfaceTriangles.push_back(std::move(point2));
             m_surfaceTriangles.push_back(std::move(point3));
 
-            m_surfaceTriangles.push_back(std::move(point3));
             m_surfaceTriangles.push_back(std::move(point4));
+            m_surfaceTriangles.push_back(std::move(point3));
             m_surfaceTriangles.push_back(std::move(point2));
         }
+    }
+}
+
+void Dem::CalcNormals() {
+    for (int i = 0; i < m_surfaceTriangles.size(); i += 3) {
+        glm::vec3 u;
+        glm::vec3 v;
+        glm::vec3 n;
+        glm::vec3 a;
+
+        glm::vec3 p1 = m_surfaceTriangles.at(i);
+        glm::vec3 p2 = m_surfaceTriangles.at(i + 1);
+        glm::vec3 p3 = m_surfaceTriangles.at(i + 2);
+
+        u = p2 - p1;
+        v = p3 - p1;
+
+        n.x = ((u.y * v.z - u.z * v.y));
+        n.y = ((u.z * v.x - u.x * v.z));
+        n.z = ((u.x * v.y - u.y * v.x));
+
+
+        float dist = glm::sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+
+        n.x = n.x / dist;
+        n.y = n.y / dist;
+        n.z = n.z / dist;
+
+        //std::cout << glm::normalize(n).x << " " << glm::normalize(n).y << " " << glm::normalize(n).y << std::endl;
+        //m_normals.push_back(std::move(glm::normalize(n)));
+        m_normals.push_back(n);
+        m_normals.push_back(n);
+        m_normals.push_back(n);
     }
 }
 
@@ -201,7 +235,7 @@ void Dem::LogHeader() {
     std::cout << "Maximum elevation:" << m_header.maxElevation << std::endl;
     std::cout << "Counterclockwise angle from primary axis:" << m_header.primaryAngle << std::endl;
     std::cout << "Accuracy code:" << m_header.accuracyCode << std::endl;
-    std::cout << "Dem spatial resolution: " << m_header.spatialResolution[0] << " " << m_header.spatialResolution[1] 
+    std::cout << "Dem spatial resolution: " << m_header.spatialResolution[0] << " " << m_header.spatialResolution[1]
         << m_header.spatialResolution[2] << std::endl;
     std::cout << "Rows:" << m_header.rows << std::endl;
     std::cout << "Columns:" << m_header.columns << std::endl;
@@ -232,6 +266,10 @@ glm::vec3* Dem::GetElevationMap() {
 
 glm::vec3* Dem::GetSurfaceMap() {
     return m_surfaceTriangles.data();
+}
+
+glm::vec3* Dem::GetNormals() {
+    return m_normals.data();
 }
 
 void Dem::Close() {
