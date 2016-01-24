@@ -18,7 +18,6 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
-*.lib
 *.sbr
 obj/
 _ReSharper*/
