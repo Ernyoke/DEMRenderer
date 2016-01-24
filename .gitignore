@@ -26,4 +26,11 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 DEMRenderer/Debug*
 DEMRenderer/x64*
-ipch
+
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
