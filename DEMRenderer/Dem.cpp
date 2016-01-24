@@ -76,12 +76,10 @@ void Dem::ParseHeader() {
     m_header.primaryAngle = ToFloat(value);
 
     std::string value2;
-    //m_file >> m_header.accuracyCode;
-
     m_file >> value2;
-    m_header.spatialResolution[0] = ToFloat(value);
-    m_header.spatialResolution[1] = ToFloat(value);
-    m_header.spatialResolution[2] = ToFloat(value);
+    std::string strAccCode = value2.substr(0, 1);
+    m_header.accuracyCode = std::stoi(strAccCode);
+    m_header.spatialResolution = value2.substr(1);
 
     m_file >> m_header.rows;
     m_file >> m_header.columns;
@@ -93,6 +91,7 @@ void Dem::ParseHeader() {
 }
 
 void Dem::ParseMap() {
+    std::cout << "Parsing the heightmap..." << std::endl;
     for (int i = 0; i < m_header.columns; ++i) {
         DemElevationVector elevationVector;
         m_file >> elevationVector.x;
@@ -120,10 +119,11 @@ void Dem::ParseMap() {
         m_elevations.push_back(std::move(elevationVector));
     }
 
+    std::cout << "Calculating normalized vertices..." << std::endl;
     CreateNormalizedMap();
-    CalcNormals();
 
-    //LogMap();
+    std::cout << "Calculating normal vectors for vertices..." << std::endl;
+    CalcNormals();
 }
 
 void Dem::Parse() {
@@ -235,8 +235,7 @@ void Dem::LogHeader() {
     std::cout << "Maximum elevation:" << m_header.maxElevation << std::endl;
     std::cout << "Counterclockwise angle from primary axis:" << m_header.primaryAngle << std::endl;
     std::cout << "Accuracy code:" << m_header.accuracyCode << std::endl;
-    std::cout << "Dem spatial resolution: " << m_header.spatialResolution[0] << " " << m_header.spatialResolution[1]
-        << m_header.spatialResolution[2] << std::endl;
+    std::cout << "Dem spatial resolution: " << m_header.spatialResolution << std::endl;
     std::cout << "Rows:" << m_header.rows << std::endl;
     std::cout << "Columns:" << m_header.columns << std::endl;
 }

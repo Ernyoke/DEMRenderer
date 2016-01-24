@@ -24,11 +24,6 @@ int main(int argc, char** argv)
 {
     bool result{ false };
 
-    //glm::vec3 vertices[] = { glm::vec3(-0.5f,  -0.5f, 0.0f), glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(0.5f, -0.5f, 0.0f),
-    //    glm::vec3(0.5f,  -0.5f, 0.0f), glm::vec3(1.0f, 0.5f, 0.0f), glm::vec3(0.0f, 0.5f, 0.0f) };
-
-    //Mesh mesh(vertices, extent< decltype(vertices) >::value);
-
     float counter{ 0.0f };
 
     Dem dem;

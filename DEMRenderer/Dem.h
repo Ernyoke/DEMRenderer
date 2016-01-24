@@ -37,7 +37,7 @@ struct DemHeader {
     float maxElevation;
     float primaryAngle;
     int accuracyCode;
-    float spatialResolution[3];
+    std::string spatialResolution;
     int rows;
     int columns;
 };
